@@ -431,10 +431,11 @@ public class FreeMarkerLoginFormsProvider implements LoginFormsProvider {
      */
     protected Response processTemplate(Theme theme, String templateName, Locale locale) {
         QRCodeGenerator qrCodeGenerator= new QRCodeGenerator();
+        /*Get the image url where image is stored*/
         String imgURL= Urls.themeRoot(uriInfo.getBaseUri()).getPath() + "/login/" + theme.getName();
         String result = "";
         try {
-            
+            /*Check if the client id is other than security-admin-console, if that is the case then show our customized qr code login page*/
             if(!client.getClientId().equals("security-admin-console")) {
                qrCodeGenerator.createQRImage(realm.getName() , client.getClientId() ,imgURL);
                result= qrCodeGenerator.generateQRCodeHtml(imgURL); 
