@@ -16,79 +16,25 @@
  */
 package org.keycloak.forms.login.freemarker;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.Hashtable;
+import java.io.ByteArrayOutputStream;
+import java.util.Base64;
 
-import javax.imageio.ImageIO;
-
-import org.keycloak.theme.FreeMarkerException;
-
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.EncodeHintType;
-import com.google.zxing.WriterException;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
-import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import net.glxn.qrgen.core.image.ImageType;
+import net.glxn.qrgen.javase.QRCode;
 
 public class QRCodeGenerator {
 
-public static void createQRImage(String relamName, String clientId , String imgPath) throws FreeMarkerException {
+public static String createORLoginPage(String relamName, String clientId , String imgPath) {
+		
 		String qrCodeText = relamName +":"+clientId;
-		String filePath = "themes/src/main/resources/theme/keycloak/login/resources/img"+"/JD.png";
-		int size = 500;
-		String fileType = "png";
-		File qrFile = new File(filePath);
+		ByteArrayOutputStream bout =QRCode.from(qrCodeText).withSize(800, 800).to(ImageType.PNG).stream();
 
-		// Create the ByteMatrix for the QR-Code that encodes the given String
-		Hashtable<EncodeHintType, ErrorCorrectionLevel> hintMap = new Hashtable<>();
-		hintMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
-		QRCodeWriter qrCodeWriter = new QRCodeWriter();
-		BitMatrix byteMatrix = null;
-		try {
-			byteMatrix = qrCodeWriter.encode(qrCodeText, BarcodeFormat.QR_CODE, size, size, hintMap);
-		} catch (WriterException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		// Make the BufferedImage that are to hold the QRCode
-		int matrixWidth = byteMatrix.getWidth();
-		BufferedImage image = new BufferedImage(matrixWidth, matrixWidth, BufferedImage.TYPE_INT_RGB);
-		image.createGraphics();
-
-		Graphics2D graphics = (Graphics2D) image.getGraphics();
-		graphics.setColor(Color.WHITE);
-		graphics.fillRect(0, 0, matrixWidth, matrixWidth);
-		// Paint and save the image using the ByteMatrix
-		graphics.setColor(Color.BLACK);
-
-		for (int i = 0; i < matrixWidth; i++) {
-			for (int j = 0; j < matrixWidth; j++) {
-				if (byteMatrix.get(i, j)) {
-					graphics.fillRect(i, j, 1, 1);
-				}
-			}
-		}
-		try {
-			ImageIO.write(image, fileType, qrFile);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		String encoded = Base64.getEncoder().encodeToString(bout.toByteArray());        
+		
+		String loginTemp="<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css\"><div class=\"container\"> <div class=\"height--high\" style=\" height: 93vh;\"> <div class=\"row\"> <nav class=\"navbar\"> <div class=\"container-fluid\"> <div class=\"navbar-header\"> <a class=\"navbar-brand\" href=\"#\"> <img alt=\"Brand\" class=\"\" src=\"https://i.ibb.co/n0mRFG5/HS-logo-Key-C.png\"> </a> </div></div></nav> </div><div class=\"row\"> <div class=\"container container-table\" style=\"margin-top: 15%\"> <div class=\"row vertical-center-row\"> <div class=\"text-center col-md-4 col-md-offset-4\"> <div class=\"placeholder--text--header\"> Scan the QR code with Your Mobile App to Login </div><div> <img alt=\"QR\" class=\"qr-code\" style=\"max-height:150px;\" src=\"data:image/png;base64,"+encoded+"\"/> </div><div class=\"placeholder--text--footer\"> <a>CANT SCAN?</a> </div></div></div></div></div></div><div id=\"footer\"> <div class=\"\" style=\"\"> <p class=\"text-muted\">Secured By Hypersign.</p></div></div></div><style>/* CSS used here will be applied after bootstrap.css */body{background: url('https://i.ibb.co/s9mqdDJ/login-main.png') no-repeat center center fixed; -webkit-background-size: cover; -moz-background-size: cover; -o-background-size: cover; background-size: cover;}.qr-code{border: 1px solid #696A6A; border-radius: 2%; padding: 5px; background: white;}.container-table{display: table;}.vertical-center-row{display: table-cell; vertical-align: middle;}.placeholder--text--header{padding-bottom: 20px;}.placeholder--text--footer{padding-top: 20px;}#footer{bottom: 0; width: 100%; height: 60px; text-align: right;}</style>";
+		
+		return loginTemp;
 	}
-
-
-	public static String generateQRCodeHtml(String imgURL) throws FreeMarkerException {
-		String responseQRHtml ="<!DOCTYPE html><html><body><img src=\"" + imgURL +"/img/JD.png\" alt=\"Smiley face\" width=\"500\" height=500\"></body></html>\r\n";
-		return responseQRHtml;
-
-	}
-
-
-
 
 
 }

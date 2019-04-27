@@ -1,7 +1,8 @@
 {
-  "realm" : "demo",
-  "auth-server-url" : "/auth",
-  "ssl-required" : "external",
-  "resource" : "angular-product",
-  "public-client" : true
+  "realm": "demo",
+  "auth-server-url": "http://localhost:8081/auth",
+  "ssl-required": "external",
+  "resource": "angular-product",
+  "public-client": true,
+  "confidential-port": 0
 }
