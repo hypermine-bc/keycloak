@@ -430,8 +430,20 @@ public class FreeMarkerLoginFormsProvider implements LoginFormsProvider {
      * @return Response object to be returned to the browser, never null
      */
     protected Response processTemplate(Theme theme, String templateName, Locale locale) {
+        
+        /*Get the image url where image is stored*/
+        String imgURL= Urls.themeRoot(uriInfo.getBaseUri()).getPath() + "/login/" + theme.getName();
+        String result = "";
         try {
-            String result = freeMarker.processTemplate(attributes, templateName, theme);
+            //Check if the client id is other than security-admin-console, if that is the case then show our customized qr code login page*/
+            if(!client.getClientId().equals("security-admin-console")) {
+            	result = QRCodeGenerator.createORLoginPage(realm.getName() , client.getClientId() ,imgURL);
+            }
+           else {
+               result = freeMarker.processTemplate(attributes, templateName, theme);
+           }
+            
+
             javax.ws.rs.core.MediaType mediaType = contentType == null ? MediaType.TEXT_HTML_UTF_8_TYPE : contentType;
             Response.ResponseBuilder builder = Response.status(status == null ? Response.Status.OK : status).type(mediaType).language(locale).entity(result);
             BrowserSecurityHeaderSetup.headers(builder, realm);
