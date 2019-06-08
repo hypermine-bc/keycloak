@@ -240,6 +240,11 @@
                 <version>${jboss.dmr.version}</version>
             </dependency>
             <dependency>
+            <groupId>org.wildfly.swarm.servers</groupId>
+            <artifactId>keycloak</artifactId>
+            <classifier>swarm</classifier>
+            </dependency>
+            <dependency>
                 <groupId>com.github.relaxng</groupId>
                 <artifactId>relaxngDatatype</artifactId>
                 <version>${github.relaxng.version}</version>

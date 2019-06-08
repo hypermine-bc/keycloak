@@ -68,3 +68,4 @@ target
 # testsuite #
 #############
 *offline-token.txt
+/bin/
