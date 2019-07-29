@@ -704,13 +704,19 @@ public class AccountFormService extends AbstractSecuredLocalService {
     @Path("resource")
     @GET
     public Response resourcesPage(@QueryParam("resource_id") String resourceId) {
-        return forwardToPage("resources", AccountPages.RESOURCES);
+        return forwardToPage("resource", AccountPages.RESOURCES);
     }
 
     @Path("resource/{resource_id}")
     @GET
     public Response resourceDetailPage(@PathParam("resource_id") String resourceId) {
-        return forwardToPage("resource-detail", AccountPages.RESOURCE_DETAIL);
+        return forwardToPage("resource", AccountPages.RESOURCE_DETAIL);
+    }
+
+    @Path("resource/{resource_id}/grant")
+    @GET
+    public Response resourceDetailPageAfterGrant(@PathParam("resource_id") String resourceId) {
+        return resourceDetailPage(resourceId);
     }
 
     @Path("resource/{resource_id}/grant")
@@ -815,10 +821,16 @@ public class AccountFormService extends AbstractSecuredLocalService {
         }
 
         if (isRevoke || isRevokePolicy || isRevokePolicyAll) {
-            return forwardToPage("resource-detail", AccountPages.RESOURCE_DETAIL);
+            return forwardToPage("resource", AccountPages.RESOURCE_DETAIL);
         }
 
-        return forwardToPage("resources", AccountPages.RESOURCES);
+        return forwardToPage("resource", AccountPages.RESOURCES);
+    }
+
+    @Path("resource/{resource_id}/share")
+    @GET
+    public Response resourceDetailPageAfterShare(@PathParam("resource_id") String resourceId) {
+        return resourceDetailPage(resourceId);
     }
 
     @Path("resource/{resource_id}/share")
@@ -894,7 +906,7 @@ public class AccountFormService extends AbstractSecuredLocalService {
             }
         }
 
-        return forwardToPage("resource-detail", AccountPages.RESOURCE_DETAIL);
+        return forwardToPage("resource", AccountPages.RESOURCE_DETAIL);
     }
 
     @Path("resource")
@@ -959,7 +971,7 @@ public class AccountFormService extends AbstractSecuredLocalService {
             if (referrerUri != null) {
                 referrerUri = RedirectUtils.verifyRedirectUri(session.getContext().getUri(), referrerUri, realm, referrerClient);
             } else {
-                referrerUri = ResolveRelative.resolveRelativeUri(session.getContext().getUri().getRequestUri(), client.getRootUrl(), referrerClient.getBaseUrl());
+                referrerUri = ResolveRelative.resolveRelativeUri(session.getContext().getUri().getRequestUri(), referrerClient.getRootUrl(), referrerClient.getBaseUrl());
             }
 
             if (referrerUri != null) {
@@ -970,9 +982,8 @@ public class AccountFormService extends AbstractSecuredLocalService {
                 return new String[]{referrerName, referrerUri};
             }
         } else if (referrerUri != null) {
-            referrerClient = realm.getClientByClientId(referrer);
             if (client != null) {
-                referrerUri = RedirectUtils.verifyRedirectUri(session.getContext().getUri(), referrerUri, realm, referrerClient);
+                referrerUri = RedirectUtils.verifyRedirectUri(session.getContext().getUri(), referrerUri, realm, client);
 
                 if (referrerUri != null) {
                     return new String[]{referrer, referrerUri};
